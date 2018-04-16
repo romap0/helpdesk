@@ -5,6 +5,9 @@ import App from './App'
 import router from './router'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
+import moment from 'moment'
+
+moment.locale('ru')
 
 Vue.config.productionTip = false
 

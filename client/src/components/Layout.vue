@@ -84,7 +84,7 @@
         style="width: 300px"
         class="ml-0 pl-3">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"/>
-        <span class="hidden-sm-and-down">МедТехРейс</span>
+        <span class="hidden-sm-and-down">HelpDesk</span>
       </v-toolbar-title>
 
     </v-toolbar>
@@ -97,25 +97,6 @@
         </v-layout>
       </v-container>
     </v-content>
-
-    <!-- Sync dialog -->
-    <v-dialog
-      persistent
-      v-model="showSyncModal"
-      max-width="500px">
-      <v-card>
-        <v-card-title>
-          <span>Загрузка данных</span>
-        </v-card-title>
-        <div class="center">
-          <v-progress-circular
-            indeterminate
-            :size="70"
-            :width="7"
-            color="primary"/>
-        </div>
-      </v-card>
-    </v-dialog>
   </v-app>
 </template>
 
@@ -128,9 +109,7 @@ export default {
       { icon: 'supervisor_account', text: 'Клиенты', to: '/clients' },
       { icon: 'computer', text: 'Оборудование', to: '/equipment' }
     ]
-  }),
-  computed: {
-  }
+  })
 }
 </script>
 
