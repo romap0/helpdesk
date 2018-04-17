@@ -45,15 +45,19 @@
             <h3>Комментарии</h3>
           </v-card-title>
 
-          <v-card
-            class="elevation-0"
-            v-for="(comment, index) in ticket.comments"
-            :key="index">
-            <v-card-text>
-              <p class="grey--text">{{ comment.date | moment('from') }} <b>{{ comment.userName }}</b></p>
-              {{ comment.text }}
-            </v-card-text>
-          </v-card>
+          <div
+            class="comments-list"
+            ref="commentsList">
+            <v-card
+              class="elevation-0"
+              v-for="(comment, index) in ticket.comments"
+              :key="index">
+              <v-card-text>
+                <p class="grey--text">{{ comment.date | moment('from') }} <b>{{ comment.userName }}</b></p>
+                {{ comment.text }}
+              </v-card-text>
+            </v-card>
+          </div>
 
           <!-- Response form -->
           <v-flex
@@ -88,15 +92,20 @@
           <v-card-title>
             <h3>Сообщения</h3>
           </v-card-title>
-          <v-card
-            class="elevation-0"
-            v-for="(message, index) in ticket.messages"
-            :key="index">
-            <v-card-text>
-              <p class="grey--text">{{ message.date | moment('from') }} <b>{{ message.userName }}</b></p>
-              {{ message.text }}
-            </v-card-text>
-          </v-card>
+
+          <div
+            class="messages-list"
+            ref="messagesList">
+            <v-card
+              class="elevation-0"
+              v-for="(message, index) in ticket.messages"
+              :key="index">
+              <v-card-text>
+                <p class="grey--text">{{ message.date | moment('from') }} <b>{{ message.userName }}</b></p>
+                {{ message.text }}
+              </v-card-text>
+            </v-card>
+          </div>
 
           <!-- Response form -->
           <v-flex
@@ -131,6 +140,7 @@
 <script>
 import moment from 'moment'
 import axios from 'axios'
+import Vue from 'vue'
 
 export default {
   props: {
@@ -190,6 +200,10 @@ export default {
   methods: {
     getTicket: async function () {
       this.ticket = (await axios.get('/api/tickets/' + this.id)).data
+      Vue.nextTick(() => {
+        this.scrolComments()
+        this.scrollMessages()
+      })
     },
     sendComment: async function () {
       await axios.post(`/api/tickets/${this.ticket._id}/comments`, {userId: this.ticket.userId, text: this.newComment})
@@ -200,11 +214,27 @@ export default {
       await axios.post(`/api/tickets/${this.ticket._id}/messages`, {userId: this.ticket.userId, text: this.newMessage})
       this.newMessage = ''
       await this.getTicket()
+    },
+    scrollMessages: function () {
+      let container = this.$refs.messagesList
+      container.scrollTop = container.scrollHeight
+    },
+    scrolComments: function () {
+      let container = this.$refs.commentsList
+      container.scrollTop = container.scrollHeight
     }
   }
 }
 </script>
 
 <style>
+  .comments-list{
+    max-height: 50vh;
+    overflow: auto;
+  }
 
+  .messages-list{
+    max-height: 50vh;
+    overflow: auto;
+  }
 </style>
