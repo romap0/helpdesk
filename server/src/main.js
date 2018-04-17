@@ -12,6 +12,7 @@ const server = createServer(app)
 app.use(urlencoded({ extended: true }))
 
 app.use('/api/tickets', require('./routes/tickets'))
+app.use('/api/users', require('./routes/users'))
 
 nodeCleanup(function (exitCode, signal) {
   MongoService.disconnect()

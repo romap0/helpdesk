@@ -106,8 +106,8 @@ export default {
     drawer: null,
     items: [
       { icon: 'view_list', text: 'Заявки', to: '/tickets' },
-      { icon: 'supervisor_account', text: 'Клиенты', to: '/clients' },
-      { icon: 'computer', text: 'Оборудование', to: '/equipment' }
+      { icon: 'supervisor_account', text: 'Пользователи', to: '/users' }
+      // { icon: 'computer', text: 'Оборудование', to: '/equipment' }
     ]
   })
 }

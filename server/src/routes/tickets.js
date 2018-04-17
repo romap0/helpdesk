@@ -10,17 +10,17 @@ var router = express.Router()
 // GET /api/tickets
 router.get('/', async (req, res) => {
   console.info(req.originalUrl)
-  let payments = await new TicketsDb().get()
+  let tickets = await new TicketsDb().get()
 
-  res.json(payments)
+  res.json(tickets)
 })
 
 // GET /api/tickets/:id
 router.get('/:id', async (req, res) => {
   console.info(req.originalUrl)
-  let tickets = await new TicketsDb().get(req.params.id)
+  let ticket = await new TicketsDb().get(req.params.id)
 
-  res.json(tickets)
+  res.json(ticket)
 })
 
 // POST /api/tickets
