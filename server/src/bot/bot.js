@@ -101,4 +101,11 @@ export class Bot {
 
     this.bot.startPolling()
   }
+
+  static async sendMessage (userId, text) {
+    let user = await new UsersDb().get(userId)
+    let chatId = user.user_id
+
+    await this.bot.telegram.sendMessage(chatId, text, Extra.markdown())
+  }
 }

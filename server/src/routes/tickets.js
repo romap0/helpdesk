@@ -2,6 +2,7 @@ import { TicketsDb } from '../db'
 import { Comment } from '../models/comment'
 import { Message } from '../models/message'
 import bodyParser from 'body-parser'
+import { Bot } from '../bot/bot'
 
 var express = require('express')
 var router = express.Router()
@@ -42,7 +43,10 @@ router.patch('/:id', bodyParser.json(), async (req, res) => {
 // POST /api/tickets/:id/messages
 router.post('/:id/messages', bodyParser.json(), async (req, res) => {
   console.info(req.originalUrl)
-  await new TicketsDb().addMessage(req.params.id, new Message(req.body.userId, req.body.text))
+  let updatedTicket = await new TicketsDb().addMessage(req.params.id, new Message(req.body.userId, req.body.text))
+
+  Bot.sendMessage(updatedTicket.value.userId,
+    `*Ответ на тикет:*\n_${req.body.text}_`)
 
   res.sendStatus(200)
 })

@@ -12,14 +12,20 @@ export class TicketsDb extends CrudDb {
   }
 
   async addMessage (id, message) {
-    return this.collection.update({_id: ObjectId(id)}, {
+    return this.collection.findOneAndUpdate({_id: ObjectId(id)}, {
       $push: {'messages': message}
+    },
+    {
+      returnNewDocument: true
     })
   }
 
   async addComment (id, comment) {
-    return this.collection.update({_id: ObjectId(id)}, {
+    return this.collection.findOneAndUpdate({_id: ObjectId(id)}, {
       $push: {'comments': comment}
+    },
+    {
+      returnNewDocument: true
     })
   }
 }
