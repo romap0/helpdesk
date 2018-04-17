@@ -1,12 +1,13 @@
 <template>
-  <v-container grid-list-xl>
+  <v-container
+    grid-list-lg
+    v-if="ticket">
     <v-layout
-      row
       wrap>
 
       <!-- Title -->
       <v-flex xs12>
-        <h1>{{ ticket.title }}</h1>
+        <h3>{{ ticket.title }}</h3>
       </v-flex>
 
       <!-- Info -->
@@ -49,7 +50,7 @@
             v-for="(comment, index) in ticket.comments"
             :key="index">
             <v-card-text>
-              <p class="grey--text">{{ comment.date.format('DD MMM HH:mm') }} <b>{{ comment.userName }}</b></p>
+              <p class="grey--text">{{ comment.date | moment('DD MMM HH:mm') }} <b>{{ comment.userName }}</b></p>
               {{ comment.text }}
             </v-card-text>
           </v-card>
@@ -90,7 +91,7 @@
             v-for="(message, index) in ticket.messages"
             :key="index">
             <v-card-text>
-              <p class="grey--text">{{ message.date.format('DD MMM HH:mm') }} <b>{{ message.userName }}</b></p>
+              <p class="grey--text">{{ message.date | moment('from') }} <b>{{ message.userName }}</b></p>
               {{ message.text }}
             </v-card-text>
           </v-card>
@@ -125,8 +126,15 @@
 
 <script>
 import moment from 'moment'
+import axios from 'axios'
 
 export default {
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
+  },
   data: () => ({
     ticket: {
       _id: '154df56fg4df56g4',
@@ -171,7 +179,10 @@ export default {
     },
     newComment: '',
     newMessage: ''
-  })
+  }),
+  async created () {
+    this.ticket = (await axios.get('/api/tickets/' + this.id)).data
+  }
 }
 </script>
 

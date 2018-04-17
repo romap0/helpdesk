@@ -9,6 +9,7 @@ export class CrudDb {
   constructor (storeName) {
     this.storeName = storeName
     this.db = MongoService.db
+    this.collection = this.db.collection(this.storeName)
   }
 
   /**
@@ -16,26 +17,38 @@ export class CrudDb {
    * @param {string?} id Document id
    */
   async get (id = null) {
-    let findObj = null
     if (id) {
-      findObj = { _id: ObjectId(id) }
+      return this
+        .collection
+        .findOne(ObjectId(id))
     }
 
-    let result = await this.db
-      .collection(this.storeName)
-      .find(findObj)
-
-    return id ? result : result.toArray()
+    return this
+      .collection
+      .find()
+      .toArray()
   }
 
   /**
    * Insert document into collection
    * @param {any} data
    */
-  async put (data) {
+  async post (data) {
     let result = await this.db
       .collection(this.storeName)
       .insertOne(data)
+
+    return result
+  }
+
+  /**
+   * Replace document in collection
+   * @param {string} id
+   * @param {any} data
+   */
+  async put (id, data) {
+    let result = await this.collection
+      .replaceOne({_id: id}, data)
 
     return result
   }

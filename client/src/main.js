@@ -12,6 +12,7 @@ moment.locale('ru')
 Vue.config.productionTip = false
 
 Vue.use(Vuetify)
+Vue.use(require('vue-moment'))
 
 /* eslint-disable no-new */
 new Vue({

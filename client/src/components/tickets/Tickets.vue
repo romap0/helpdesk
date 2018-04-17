@@ -2,7 +2,7 @@
   <v-flex xs12>
     <v-data-table
       :headers="headers"
-      :items="items"
+      :items="tickets"
       class="elevation-1"
     >
       <template
@@ -30,6 +30,7 @@
 
 <script>
 import Loader from '../Loader'
+import axios from 'axios'
 
 export default {
   components: {
@@ -45,7 +46,7 @@ export default {
         { text: 'Статус', value: 'status' },
         { text: 'Действия', value: '' }
       ],
-      items: [
+      tickets: [
         {
           _id: '154df56fg4df56g4',
           title: 'Не работает принтер',
@@ -70,6 +71,9 @@ export default {
       ],
       showModal: false
     }
+  },
+  async created () {
+    this.tickets = (await axios.get('/api/tickets')).data
   }
 }
 </script>

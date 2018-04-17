@@ -17,7 +17,8 @@ export default new Router({
         {
           path: '/tickets/:id',
           name: 'Edit Ticket',
-          component: EditTicket
+          component: EditTicket,
+          props: true
         },
         {
           path: '/tickets',
