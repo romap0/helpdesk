@@ -1,26 +1,29 @@
-import { MongoService } from './services/mongoService'
-import { urlencoded } from 'body-parser'
-import express from 'express'
-import { createServer } from 'http'
-import nodeCleanup from 'node-cleanup'
-import { Bot } from './bot/bot'
-require('dotenv-expand')(require('dotenv').config())
+import { MongoService } from "./services/mongoService";
+import { urlencoded } from "body-parser";
+import express from "express";
+import { createServer } from "http";
+import nodeCleanup from "node-cleanup";
+import { Bot } from "./bot/bot";
+require("dotenv-expand")(require("dotenv").config());
+import moment from "moment";
 
-const app = express()
-const server = createServer(app)
+moment.locale('ru')
 
-app.use(urlencoded({ extended: true }))
+const app = express();
+const server = createServer(app);
 
-app.use('/api/tickets', require('./routes/tickets'))
-app.use('/api/users', require('./routes/users'))
+app.use(urlencoded({ extended: true }));
 
-nodeCleanup(function (exitCode, signal) {
-  MongoService.disconnect()
-})
+app.use("/api/tickets", require("./routes/tickets"));
+app.use("/api/users", require("./routes/users"));
+
+nodeCleanup(function(exitCode, signal) {
+  MongoService.disconnect();
+});
 
 MongoService.connect().then(async () => {
-  await server.listen(process.env.PORT || 8090)
-  console.info(`Server started on http://localhost:${server.address().port}`)
+  await server.listen(process.env.PORT || 8090);
+  console.info(`Server started on http://localhost:${server.address().port}`);
 
-  Bot.start()
-})
+  Bot.start();
+});

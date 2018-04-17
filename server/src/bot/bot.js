@@ -8,9 +8,11 @@ import { Actions } from './actions'
 import { Ticket } from '../models/ticket'
 import { States } from './states'
 import { Message } from '../models/message'
+import { formatTicket } from "./format";
+import { TicketStatus } from '../enums';
 
 export class Bot {
-  static start () {
+  static start() {
     this.bot = new Telegraf(process.env.BOT_TOKEN, {
       telegram: {
         // agent: new HttpsProxyAgent('https://89.236.17.106:3128')
@@ -26,9 +28,9 @@ export class Bot {
 
     // Register middleware
     this.bot.use(async (ctx, next) => {
-      if (ctx.message.contact) {
-        next()
-        return
+      if (ctx.message && ctx.message.contact) {
+        next();
+        return;
       }
 
       if (!ctx.state.user) {
@@ -70,9 +72,15 @@ export class Bot {
 
     this.bot.hears(Actions.MyTickets, async ctx => {
       let tickets = await new TicketsDb().getByUserId(ctx.state.user._id)
+      tickets = tickets.filter(t=>t.status !== TicketStatus.Closed)
 
       tickets.forEach(ticket => {
-        ctx.replyWithMarkdown(ticket.title)
+        ctx.replyWithMarkdown(formatTicket(ticket), Extra.markup(m =>
+            m.inlineKeyboard([
+              m.callbackButton("Сообщение", "_message_" + ticket._id),
+              m.callbackButton("Решено", "_resolved_" + ticket._id, ticket.status === TicketStatus.Resolved)
+            ])
+          ));
       })
     })
 
@@ -86,8 +94,15 @@ export class Bot {
         let ticket = new Ticket(ctx.state.user._id, ctx.message.text)
         let {insertedId} = await new TicketsDb().post(ticket)
 
+        console.log(ticket)
         ctx.session.state = States.WaitForMessage
         ctx.session.selectedTicket = insertedId
+        ctx.replyWithMarkdown(formatTicket(ticket), Extra.markup(m =>
+            m.inlineKeyboard([
+              m.callbackButton("Сообщение", "_message_" + ticket._id),
+              m.callbackButton("Решено", "_resolved_" + ticket._id)
+            ])
+          ));
         ctx.reply('Тикет создан. Введите подробности')
         return
       }
@@ -99,10 +114,31 @@ export class Bot {
       }
     })
 
+    this.bot.action(/_message_(.*)/, async ctx => {
+      let id = ctx.match[1]
+      ctx.session.state = States.WaitForMessage;
+      ctx.session.selectedTicket = id;
+      ctx.reply('Введите сообщение');
+      ctx.answerCbQuery()
+    })
+
+    this.bot.action(/_resolved_(.*)/, async ctx => {
+      let id = ctx.match[1];
+      let ticket = (await new TicketsDb().setStatus(id, TicketStatus.Resolved)).value
+      console.log(ticket);
+
+      ctx.editMessageText(formatTicket(ticket), Extra.markup(m =>
+            m.inlineKeyboard([
+              m.callbackButton("Сообщение", "_message_" + id)
+            ])
+          ).markdown());
+      ctx.answerCbQuery();
+    });
+
     this.bot.startPolling()
   }
 
-  static async sendMessage (userId, text) {
+  static async sendMessage(userId, text) {
     let user = await new UsersDb().get(userId)
     let chatId = user.user_id
 

@@ -17,6 +17,7 @@
     "http": "^0.0.0",
     "https-proxy-agent": "^2.2.1",
     "jsonpatch-to-mongodb": "^0.4.0",
+    "moment": "^2.22.1",
     "mongodb": "^3.0.6",
     "morgan": "^1.9.0",
     "node-cleanup": "^2.1.2",
@@ -24,10 +25,13 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.3",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-2": "^6.24.1",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-html": "^4.0.3",
+    "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-standard": "^3.0.1",
     "nodemon": "^1.17.3",
     "standard": "^11.0.1"
