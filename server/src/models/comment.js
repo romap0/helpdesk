@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb'
 
-export class Ticket {
-  constructor (userId, title) {
+export class Comment {
+  constructor (userId, text) {
     this.userId = ObjectId(userId)
-    this.title = title
+    this.text = text
     this.date = new Date()
   }
 }

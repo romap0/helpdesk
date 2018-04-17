@@ -50,7 +50,7 @@
             v-for="(comment, index) in ticket.comments"
             :key="index">
             <v-card-text>
-              <p class="grey--text">{{ comment.date | moment('DD MMM HH:mm') }} <b>{{ comment.userName }}</b></p>
+              <p class="grey--text">{{ comment.date | moment('from') }} <b>{{ comment.userName }}</b></p>
               {{ comment.text }}
             </v-card-text>
           </v-card>
@@ -67,11 +67,13 @@
                 label="Ответ"
                 v-model="newComment"
                 rows="1"
+                @keypress.enter.prevent="sendComment()"
               />
               <v-btn
                 flat
                 icon
-                class="shrink">
+                class="shrink"
+                @click="sendComment()">
                 <v-icon>send</v-icon>
               </v-btn>
             </v-layout>
@@ -108,11 +110,13 @@
                 label="Ответ"
                 v-model="newMessage"
                 rows="1"
+                @keypress.enter.prevent="sendMessage()"
               />
               <v-btn
                 flat
                 icon
-                class="shrink">
+                class="shrink"
+                @click="sendMessage()">
                 <v-icon>send</v-icon>
               </v-btn>
             </v-layout>
@@ -181,7 +185,22 @@ export default {
     newMessage: ''
   }),
   async created () {
-    this.ticket = (await axios.get('/api/tickets/' + this.id)).data
+    this.getTicket()
+  },
+  methods: {
+    getTicket: async function () {
+      this.ticket = (await axios.get('/api/tickets/' + this.id)).data
+    },
+    sendComment: async function () {
+      await axios.post(`/api/tickets/${this.ticket._id}/comments`, {userId: this.ticket.userId, text: this.newComment})
+      this.newComment = ''
+      await this.getTicket()
+    },
+    sendMessage: async function () {
+      await axios.post(`/api/tickets/${this.ticket._id}/messages`, {userId: this.ticket.userId, text: this.newMessage})
+      this.newMessage = ''
+      await this.getTicket()
+    }
   }
 }
 </script>
