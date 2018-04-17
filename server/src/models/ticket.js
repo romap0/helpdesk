@@ -7,5 +7,6 @@ export class Ticket {
     this.title = title
     this.date = new Date()
     this.status = TicketStatus.New
+    this.tags = []
   }
 }

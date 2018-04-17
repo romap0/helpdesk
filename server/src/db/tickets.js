@@ -28,4 +28,20 @@ export class TicketsDb extends CrudDb {
       returnNewDocument: true
     })
   }
+
+  async setStatus (id, status) {
+    return this.collection.findOneAndUpdate({_id: ObjectId(id)}, {
+      $set: {status: status}},
+    {
+      returnNewDocument: true
+    })
+  }
+
+  async setTags (id, tags) {
+    return this.collection.findOneAndUpdate({_id: ObjectId(id)}, {
+      $set: {tags: tags}},
+    {
+      returnNewDocument: true
+    })
+  }
 }

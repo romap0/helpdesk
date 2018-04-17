@@ -1,37 +1,72 @@
 <template>
   <v-container
+    fluid
     grid-list-lg
+    fill-height
     v-if="ticket">
     <v-layout
       wrap>
 
       <!-- Title -->
       <v-flex xs12>
-        <h3>{{ ticket.title }}</h3>
+        <v-card>
+          <v-card-title>
+            <h3>{{ ticket.title }}</h3>
+          </v-card-title>
+          <v-card-text>
+            <v-layout>
+
+              <v-flex xs3>
+                <v-select
+                  :items="statuses"
+                  v-model="ticket.status"
+                  label="Статус"
+                />
+              </v-flex>
+
+              <v-flex xs9>
+                <v-select
+                  label="Теги"
+                  chips
+                  tags
+                  solo
+                  prepend-icon="label"
+                  append-icon=""
+                  clearable
+                  v-model="ticket.tags"
+                >
+                  <template
+                    slot="selection"
+                    slot-scope="data">
+                    <v-chip
+                      close
+                      @input="removeTag(data.item)"
+                      :selected="data.selected"
+                    >
+                      <strong>{{ data.item }}</strong>
+                    </v-chip>
+                  </template>
+                </v-select>
+              </v-flex>
+
+            </v-layout>
+          </v-card-text>
+        </v-card>
       </v-flex>
 
-      <!-- Info -->
+      <!-- User -->
       <v-flex xs4>
         <v-card>
-          <v-list>
-            <v-list-tile>
+          <v-list
+            two-line>
+            <v-list-tile
+              avatar>
+              <v-list-tile-avatar>
+                <v-icon x-large>account_circle</v-icon>
+              </v-list-tile-avatar>
               <v-list-tile-content>
-                <v-list-tile-sub-title>
-                  Компания
-                </v-list-tile-sub-title>
-                <v-list-tile-title>
-                  {{ ticket.companyName }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile>
-              <v-list-tile-content>
-                <v-list-tile-sub-title>
-                  Сотрудник
-                </v-list-tile-sub-title>
-                <v-list-tile-title>
-                  {{ ticket.userName }}
-                </v-list-tile-title>
+                <v-list-tile-title>{{ user.first_name }} {{ user.last_name }}</v-list-tile-title>
+                <v-list-tile-sub-title>{{ user.phone_number }}</v-list-tile-sub-title>
               </v-list-tile-content>
             </v-list-tile>
           </v-list>
@@ -138,7 +173,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import axios from 'axios'
 import Vue from 'vue'
 
@@ -150,60 +184,44 @@ export default {
     }
   },
   data: () => ({
-    ticket: {
-      _id: '154df56fg4df56g4',
-      title: 'Не работает принтер',
-      companyName: 'МедТехРейс',
-      userName: 'Елена',
-      status: 'Новая',
-      comments: [
-        {
-          userName: 'Роман',
-          date: moment(),
-          text: `Vestibulum dis cras dolorum odit odit hymenaeos
-          sunt mollitia proin iste omnis officiis ducimus.
-          Magni parturient, cubilia qui earum nostrud!
-          Quibusdam commodo? Officiis eaque perferendis.`
-        },
-        {
-          userName: 'Роман',
-          date: moment(),
-          text: `Vestibulum dis cras dolorum odit odit hymenaeos
-          sunt mollitia proin iste omnis officiis ducimus.
-          Magni parturient, cubilia qui earum nostrud!
-          Quibusdam commodo? Officiis eaque perferendis.
-          `
-        }
-      ],
-      messages: [
-        {
-          userName: 'Роман',
-          date: moment(),
-          text: `Magni parturient, cubilia qui earum nostrud!
-          Quibusdam commodo? Officiis eaque perferendis.`
-        },
-        {
-          userName: 'Елена',
-          date: moment(),
-          text: `Vestibulum dis cras dolorum odit odit hymenaeos
-          sunt mollitia proin iste omnis officiis ducimus.
-          `
-        }
-      ]
-    },
+    ticket: {},
+    user: {},
     newComment: '',
-    newMessage: ''
+    newMessage: '',
+    statuses: [
+      'Новый',
+      'Активный',
+      'Решённый',
+      'Закрытый'
+    ]
   }),
   async created () {
     this.getTicket()
   },
+  watch: {
+    'ticket.tags': function (tags) {
+      console.log(tags)
+
+      axios.put(`/api/tickets/${this.ticket._id}/tags`, {tags: tags})
+    },
+    'ticket.status': function (status) {
+      console.log(status)
+
+      axios.put(`/api/tickets/${this.ticket._id}/status`, {status: status})
+    }
+  },
   methods: {
     getTicket: async function () {
       this.ticket = (await axios.get('/api/tickets/' + this.id)).data
+      this.getUser()
+
       Vue.nextTick(() => {
         this.scrolComments()
         this.scrollMessages()
       })
+    },
+    getUser: async function () {
+      this.user = (await axios.get('/api/users/' + this.ticket.userId)).data
     },
     sendComment: async function () {
       await axios.post(`/api/tickets/${this.ticket._id}/comments`, {userId: this.ticket.userId, text: this.newComment})
@@ -222,6 +240,9 @@ export default {
     scrolComments: function () {
       let container = this.$refs.commentsList
       container.scrollTop = container.scrollHeight
+    },
+    removeTag (item) {
+      this.ticket.tags.splice(this.ticket.tags.indexOf(item), 1)
     }
   }
 }
@@ -229,12 +250,12 @@ export default {
 
 <style>
   .comments-list{
-    max-height: 50vh;
+    max-height: 40vh;
     overflow: auto;
   }
 
   .messages-list{
-    max-height: 50vh;
+    max-height: 40vh;
     overflow: auto;
   }
 </style>

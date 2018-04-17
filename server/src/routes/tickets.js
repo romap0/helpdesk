@@ -59,4 +59,20 @@ router.post('/:id/comments', bodyParser.json(), async (req, res) => {
   res.sendStatus(200)
 })
 
+// PUT /api/tickets/:id/status
+router.put('/:id/status', bodyParser.json(), async (req, res) => {
+  console.info(req.originalUrl)
+  await new TicketsDb().setStatus(req.params.id, req.body.status)
+
+  res.sendStatus(200)
+})
+
+// PUT /api/tickets/:id/tags
+router.put('/:id/tags', bodyParser.json(), async (req, res) => {
+  console.info(req.originalUrl)
+  await new TicketsDb().setTags(req.params.id, req.body.tags)
+
+  res.sendStatus(200)
+})
+
 module.exports = router

@@ -11,4 +11,12 @@ router.get('/', async (req, res) => {
   res.json(users)
 })
 
+// GET /api/users/:id
+router.get('/:id', async (req, res) => {
+  console.info(req.originalUrl)
+  let user = await new UsersDb().get(req.params.id)
+
+  res.json(user)
+})
+
 module.exports = router
