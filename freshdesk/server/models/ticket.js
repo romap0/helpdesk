@@ -1,6 +1,6 @@
-import { TicketStatus, TicketPriority, TicketSource } from '../enums'
+const { TicketStatus, TicketPriority, TicketSource } = require('../enums')
 
-export class Ticket {
+exports = class Ticket {
   constructor (userId, subject) {
     this.requester_id = userId
     this.subject = subject

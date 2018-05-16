@@ -10,6 +10,7 @@ import { States } from './states'
 import { Message } from '../models/message'
 import { formatTicket } from './format'
 import { TicketStatus } from '../enums'
+import freshdesk from '../services/freshdesk'
 
 export class Bot {
   static start () {
@@ -22,7 +23,13 @@ export class Bot {
 
     // Authorize middleware
     this.bot.use(async (ctx, next) => {
-      ctx.state.user = await new UsersDb().getByTelegramId(ctx.from.id)
+      try {
+        let contactsByTelegramId = await freshdesk.listAllContactsAsync({mobile: 'tg:' + ctx.from.id})
+        ctx.state.user = contactsByTelegramId[0]
+      } catch (ex) {
+        console.error(ex)
+      }
+
       next()
     })
 
@@ -56,32 +63,47 @@ export class Bot {
         return
       }
 
-      if (ctx.state.user) {
-        await new UsersDb().put(ctx.state.user.user_id, contact)
-      } else {
-        await new UsersDb().post(contact)
-      }
+      let phone = contact.phone_number.replace(/[^0-9]/, '')
 
-      ctx.reply(
-        'Спасибо. Теперь вы можете создать новый тикет',
-        Markup.keyboard([[Actions.NewTicket, Actions.MyTickets]])
-          .resize()
-          .extra()
-      )
+      try {
+        if (ctx.state.user) {
+          await freshdesk.updateContactAsync(ctx.state.user.id, {phone: phone})
+        } else {
+          await freshdesk.createContactAsync({name: `${contact.first_name} ${contact.last_name}`, phone: phone, mobile: `tg:${contact.user_id}`})
+        }
+
+        ctx.reply(
+          'Спасибо. Теперь вы можете создать новый тикет',
+          Markup.keyboard([[Actions.NewTicket, Actions.MyTickets]])
+            .resize()
+            .extra()
+        )
+      } catch (ex) {
+        console.error(ex)
+        ctx.reply('⚠️ Не удалось авторизоваться. Попробуйте ещё раз.')
+      }
     })
 
     this.bot.hears(Actions.MyTickets, async ctx => {
-      let tickets = await new TicketsDb().getByUserId(ctx.state.user._id)
-      tickets = tickets.filter(t => t.status !== TicketStatus.Closed)
+      try {
+        let tickets = await freshdesk.listAllTicketsAsync({requester_id: ctx.state.user.id})
 
-      tickets.forEach(ticket => {
-        ctx.replyWithMarkdown(formatTicket(ticket), Extra.markup(m =>
-          m.inlineKeyboard([
-            m.callbackButton('Сообщение', '_message_' + ticket._id),
-            m.callbackButton('Решено', '_resolved_' + ticket._id, ticket.status === TicketStatus.Resolveds)
-          ])
-        ))
-      })
+        tickets.forEach(ticket => {
+          ctx.replyWithMarkdown(formatTicket(ticket), Extra.markup(m =>
+            m.inlineKeyboard([
+              m.callbackButton('Сообщение', '_message_' + ticket.id),
+              m.callbackButton('Решено', '_resolved_' + ticket.id, ticket.status === TicketStatus.Resolved)
+            ])
+          ))
+        })
+
+        if (!tickets.length) {
+          ctx.reply('Открытых заявок нет')
+        }
+      } catch (ex) {
+        console.error(ex)
+        ctx.reply('⚠️ Не удалось получить список заявок.')
+      }
     })
 
     this.bot.hears(Actions.NewTicket, async ctx => {
@@ -91,19 +113,23 @@ export class Bot {
 
     this.bot.hears(/.*/, async ctx => {
       if (ctx.session.state === States.WaitForTitle) {
-        let ticket = new Ticket(ctx.state.user._id, ctx.message.text)
-        let {insertedId} = await new TicketsDb().post(ticket)
+        try {
+          let ticket = new Ticket(ctx.state.user.id, ctx.message.text)
+          let {id} = await freshdesk.createTicketAsync(ticket)
 
-        console.log(ticket)
-        ctx.session.state = States.WaitForMessage
-        ctx.session.selectedTicket = insertedId
-        ctx.replyWithMarkdown(formatTicket(ticket), Extra.markup(m =>
-          m.inlineKeyboard([
-            m.callbackButton('Сообщение', '_message_' + ticket._id),
-            m.callbackButton('Решено', '_resolved_' + ticket._id)
-          ])
-        ))
-        ctx.reply('Тикет создан. Введите подробности')
+          ctx.session.state = States.WaitForMessage
+          ctx.session.selectedTicket = id
+          ctx.replyWithMarkdown(formatTicket(ticket), Extra.markup(m =>
+            m.inlineKeyboard([
+              m.callbackButton('Сообщение', '_message_' + id),
+              m.callbackButton('Решено', '_resolved_' + id)
+            ])
+          ))
+          ctx.reply('Тикет создан. Введите подробности')
+        } catch (ex) {
+          console.error(ex)
+          ctx.reply('⚠️ Не удалось создать заявку.')
+        }
         return
       }
 

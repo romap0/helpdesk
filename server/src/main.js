@@ -1,4 +1,4 @@
-import { MongoService } from './services/mongoService'
+// import { MongoService } from './services/mongoService'
 import { urlencoded } from 'body-parser'
 import express from 'express'
 import { createServer } from 'http'
@@ -18,12 +18,13 @@ app.use('/api/tickets', require('./routes/tickets'))
 app.use('/api/users', require('./routes/users'))
 
 nodeCleanup(function (exitCode, signal) {
-  MongoService.disconnect()
+  // MongoService.disconnect()
 })
 
-MongoService.connect().then(async () => {
-  await server.listen(process.env.PORT || 8090)
-  console.info(`Server started on http://localhost:${server.address().port}`)
+// MongoService.connect().then(async () => {
+server.listen(process.env.PORT || 8090)
 
-  Bot.start()
-})
+console.info(`Server started on http://localhost:${server.address().port}`)
+
+Bot.start()
+// })

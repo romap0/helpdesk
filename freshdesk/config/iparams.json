@@ -1,0 +1,20 @@
+{
+  "telegram_token": {
+    "display_name": "Telegram Bot Token",
+    "description": "Please enter your Telegram Bot Token - Example: 776622144:WqkVVjtLdnus3klphcUuAaGA8WCsEzU7F6m",
+    "type": "text",
+    "required": true
+  },
+  "freshdesk_domain": {
+    "display_name": "Freshdesk domain",
+    "description": "Please enter freshdesk subdomain - Example: https://yourdomain.freshdesk.com",
+    "type": "text",
+    "required": true
+  },
+  "freshdesk_key": {
+    "display_name": "Freshdesk API Key",
+    "description": "Please enter freshdesk api key - Example: poxY0fCIp6oVJnIWwhmj",
+    "type": "text",
+    "required": true
+  }
+}

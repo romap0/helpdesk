@@ -1,0 +1,19 @@
+{
+  "platform-version": "2.0",
+  "dependencies": {
+    "moment": "2.22.1",
+    "telegraf": "3.20.0",
+    "freshdesk-api": "2.5.0",
+    "bluebird": "3.5.1"
+  },
+  "product": {
+    "freshdesk": {
+      "location": {
+        "ticket_sidebar": {
+          "url": "template.html",
+          "icon": "icon.svg"
+        }
+      }
+    }
+  }
+}

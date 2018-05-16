@@ -1,3 +1,6 @@
+.report.json
+.fdk
+
 # Logs
 logs
 *.log

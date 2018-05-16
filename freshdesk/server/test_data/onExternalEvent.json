@@ -1,0 +1,10 @@
+{
+  "account_id": 12345,
+  "event": "onExternalEvent",
+  "timestamp": 1500351361762,
+  "options": "freshdesk.onExternalEvent",
+  "data": "{\"update_id\":140984295,\r\n\"message\":{\"message_id\":99,\"from\":{\"id\":68042467,\"is_bot\":false,\"first_name\":\"\\u0420\\u043e\\u043c\\u0430\\u043d\",\"last_name\":\"\\u041f\\u0430\\u0432\\u043b\\u043e\\u0432\",\"username\":\"romap0\",\"language_code\":\"ru\"},\"chat\":{\"id\":68042467,\"first_name\":\"\\u0420\\u043e\\u043c\\u0430\\u043d\",\"last_name\":\"\\u041f\\u0430\\u0432\\u043b\\u043e\\u0432\",\"username\":\"romap0\",\"type\":\"private\"},\"date\":1513098785,\"text\":\"📋 Мои тикеты\"}}",
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}
