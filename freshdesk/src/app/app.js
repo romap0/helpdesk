@@ -29,7 +29,14 @@ $(document).ready(() => {
           console.log('Exception - ', e)
         })
 
-      $('#send').click(() => {
+      $('#send').click(() => sendMessage())
+      $('#message').keyup((args) => {
+        if (args.key === 'Enter' && args.ctrlKey) {
+          sendMessage()
+        }
+      })
+
+      function sendMessage () {
         let message = $('#message').val()
 
         if (!message) {
@@ -46,10 +53,11 @@ $(document).ready(() => {
         })
           .then(response => {
             notifyUser('success', 'Message sent successfully.')
+            $('#message').val('')
           })
           .catch(error => {
             notifyUser('danger', error.message || 'Unexpected error.')
           })
-      })
+      }
     })
 })

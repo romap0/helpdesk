@@ -1,4 +1,4 @@
-export const States = {
+exports = {
   WaitForTitle: 1,
   WaitForMessage: 2
 }

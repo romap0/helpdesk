@@ -1,10 +1,11 @@
 'use strict'
 
-// require('dotenv-expand')(require('dotenv').config())
-// const moment = require('moment')
-// moment.locale('ru')
+/* global generateTargetUrl, renderData, $db */
 
-const Bot = require('./bot/index')
+const moment = require('moment')
+moment.locale('ru')
+
+var Bot = require('./bot/index')
 
 exports = {
 
@@ -19,14 +20,15 @@ exports = {
    * The generated url is registered in Telegram nd is triggered when new message received.
    */
   onAppInstall: function (args) {
-    this.generateTargetUrl()
+    generateTargetUrl()
       .done(targetUrl => {
+        console.log(targetUrl)
         new Bot(args.iparams.telegram_token).setWebhook(targetUrl)
-          .then(() => this.renderData())
-          .catch(err => this.renderData({ message: err.message }))
+          .then(() => renderData())
+          .catch(err => renderData({ message: err.message }))
       })
       .fail(function () {
-        this.renderData({ message: 'Error while setting webhook' })
+        renderData({ message: 'Error while setting webhook' })
       })
   },
 
@@ -35,8 +37,8 @@ exports = {
    */
   onAppUninstall: function (args) {
     new Bot(args.iparams.telegram_token).deleteWebhook()
-      .then(() => this.renderData())
-      .catch(err => this.renderData({ message: err.message }))
+      .then(() => renderData())
+      .catch(err => renderData({ message: err.message }))
   },
 
   /**
@@ -45,12 +47,13 @@ exports = {
    */
   onExternalEvent: function (args) {
     let freshdesk = require('./freshdesk')(args.iparams.freshdesk_domain, args.iparams.freshdesk_key)
-    new Bot(args.iparams.telegram_token, freshdesk).bot.handleUpdate(JSON.parse(args.data))
+    new Bot(args.iparams.telegram_token, freshdesk, $db).bot.handleUpdate(JSON.parse(args.data))
   },
 
   sendMessage: args => {
-    new Bot(args.iparams.telegram_token).sendMessage(args.userId, args.message)
-      .then(() => this.renderData())
-      .catch(err => this.renderData({ message: err.message }))
+    new Bot(args.iparams.telegram_token)
+      .sendMessage(args.userId, `*Ответ на обращение*\n_${args.message}_`)
+      .then(() => renderData())
+      .catch(err => renderData({ message: err.message }))
   }
 }
