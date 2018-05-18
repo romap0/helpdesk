@@ -3,7 +3,7 @@ const babel = require('gulp-babel')
 const eslint = require('gulp-eslint')
 
 gulp.task('babel', () =>
-  gulp.src('src/**/*.js')
+  gulp.src(['src/**/*.js', '!**/node_modules/**/*'])
     .pipe(
       babel({
         presets: ['es2015']
