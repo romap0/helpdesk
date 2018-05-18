@@ -22,12 +22,20 @@ exports = {
   onAppInstall: function (args) {
     generateTargetUrl()
       .done(targetUrl => {
-        console.log(targetUrl)
+        console.info(targetUrl)
+
         new Bot(args.iparams.telegram_token).setWebhook(targetUrl)
-          .then(() => renderData())
-          .catch(err => renderData({ message: err.message }))
+          .then(() => {
+            console.info('webhook successfully set')
+            renderData()
+          })
+          .catch(err => {
+            new Bot(args.iparams.telegram_token).log(err.message)
+            renderData({ message: err.message })
+          })
       })
       .fail(function () {
+        new Bot(args.iparams.telegram_token).log('no url')
         renderData({ message: 'Error while setting webhook' })
       })
   },
@@ -47,7 +55,15 @@ exports = {
    */
   onExternalEvent: function (args) {
     let freshdesk = require('./freshdesk')(args.iparams.freshdesk_domain, args.iparams.freshdesk_key)
-    new Bot(args.iparams.telegram_token, freshdesk, $db).bot.handleUpdate(JSON.parse(args.data))
+    try {
+      console.info('new update:', typeof (args.data) === 'object' ? JSON.stringify(args.data) : args.data)
+      console.info('typeof:', typeof (args.data))
+
+      let update = typeof (args.data) === 'string' ? JSON.parse(args.data) : args.data
+      new Bot(args.iparams.telegram_token, freshdesk, $db).bot.handleUpdate(update)
+    } catch (err) {
+      console.error(err)
+    }
   },
 
   sendMessage: args => {

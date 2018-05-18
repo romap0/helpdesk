@@ -3,7 +3,7 @@
   "event": "onExternalEvent",
   "timestamp": 1500351361762,
   "options": "freshdesk.onExternalEvent",
-  "data": "{\"update_id\":140984295,\r\n\"message\":{\"message_id\":99,\"from\":{\"id\":68042467,\"is_bot\":false,\"first_name\":\"\\u0420\\u043e\\u043c\\u0430\\u043d\",\"last_name\":\"\\u041f\\u0430\\u0432\\u043b\\u043e\\u0432\",\"username\":\"romap0\",\"language_code\":\"ru\"},\"chat\":{\"id\":68042467,\"first_name\":\"\\u0420\\u043e\\u043c\\u0430\\u043d\",\"last_name\":\"\\u041f\\u0430\\u0432\\u043b\\u043e\\u0432\",\"username\":\"romap0\",\"type\":\"private\"},\"date\":1513098785,\"text\":\"➕ Новый тикет\"}}",
+  "data": "{\"update_id\":540114492,\"callback_query\":{\"id\":\"292240172652898110\",\"from\":{\"id\":68042467,\"is_bot\":false,\"first_name\":\"Роман\",\"last_name\":\"Павлов\",\"username\":\"romap0\",\"language_code\":\"ru\"},\"message\":{\"message_id\":193,\"from\":{\"id\":568282361,\"is_bot\":true,\"first_name\":\"PQLab\",\"username\":\"PQLabBot\"},\"chat\":{\"id\":68042467,\"first_name\":\"Роман\",\"last_name\":\"Павлов\",\"username\":\"romap0\",\"type\":\"private\"},\"date\":1526659619,\"text\":\"Тикет #3\\n🕓 14 мая 15:14\\n✔️ Открыто\\n123\",\"entities\":[{\"offset\":0,\"length\":8,\"type\":\"bold\"}]},\"chat_instance\":\"-1933528738231040676\",\"data\":\"_message_3\"}}",
   "headers": {
     "Content-Type": "application/json"
   }

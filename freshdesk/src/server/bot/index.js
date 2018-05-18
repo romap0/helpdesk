@@ -20,24 +20,29 @@ exports = class Bot {
 
     // Authorize middleware
     this.bot.use((ctx, next) => {
+      console.info('get contact middleware:', 'start')
       freshdesk.listAllContactsAsync({ mobile: 'tg:' + ctx.from.id })
         .then(contacts => {
           ctx.state.user = contacts[0]
+          console.info('get contact middleware:', ctx.state.user)
           return next()
         })
         .catch(err => {
-          console.error(err)
+          console.error('get contact middleware:', err)
           return next()
         })
     })
 
     // Register middleware
     this.bot.use((ctx, next) => {
+      console.info('check contact middleware: start')
       if (ctx.message && ctx.message.contact) {
+        console.info('check contact middleware: contact passed')
         return next()
       }
 
       if (!ctx.state.user) {
+        console.info('check contact middleware: no contact')
         return ctx.reply(
           'Отправьте мне свои контактные данные, пожалуйста',
           Extra.markup(markup => {
@@ -48,6 +53,7 @@ exports = class Bot {
           })
         )
       } else {
+        console.info('check contact middleware: contact ok')
         return next()
       }
     })
@@ -56,6 +62,7 @@ exports = class Bot {
 
     this.bot.on('contact', ctx =>
       new Promise((resolve, reject) => {
+        console.info('contact: start')
         let contact = ctx.message.contact
         if (contact.user_id !== ctx.from.id) {
           ctx.reply('Вы отправили чужие данные!')
@@ -63,18 +70,24 @@ exports = class Bot {
         }
 
         let phone = contact.phone_number.replace(/[^0-9]/, '')
+        console.info('contact:', phone)
 
-        if (ctx.state.user) {
-          freshdesk.updateContactAsync(ctx.state.user.id, { phone: phone })
-            .then(() => onSuccess())
-            .catch(err => onError(err))
-        } else {
-          freshdesk.createContactAsync({ name: `${contact.first_name} ${contact.last_name}`, phone: phone, mobile: `tg:${contact.user_id}` })
-            .then(() => onSuccess())
-            .catch(err => onError(err))
+        try {
+          if (ctx.state.user) {
+            freshdesk.updateContactAsync(ctx.state.user.id, { phone: phone })
+              .then(() => onSuccess())
+              .catch(err => onError(err))
+          } else {
+            freshdesk.createContactAsync({ name: `${contact.first_name} ${contact.last_name}`, phone: phone, mobile: `tg:${contact.user_id}` })
+              .then(() => onSuccess())
+              .catch(err => onError(err))
+          }
+        } catch (err) {
+          console.error('contact:', err)
         }
 
         function onSuccess () {
+          console.info('contact: register success')
           ctx.reply(
             'Спасибо. Теперь вы можете создать новый тикет',
             Markup.keyboard([[Actions.NewTicket, Actions.MyTickets]])
@@ -84,7 +97,7 @@ exports = class Bot {
         }
 
         function onError (err) {
-          console.error(err)
+          console.error('contact', err)
           ctx.reply('⚠️ Не удалось авторизоваться. Попробуйте ещё раз.')
         }
       }))
@@ -151,25 +164,50 @@ exports = class Bot {
         }
       }))
 
-    this.bot.action(/_message_(.*)/, ctx => {
-      let id = ctx.match[1]
-      ctx.session.state = States.WaitForMessage
-      ctx.session.selectedTicket = id
-      ctx.reply('Введите сообщение')
-      ctx.answerCbQuery(ctx.callbackQuery.id, 'Введите сообщение', false)
-    })
+    this.bot.action(
+      action => {
+        return /_message_(\d+)/.test(action)
+      },
+      ctx => {
+        let id = ctx.match[1]
+        ctx.session.state = States.WaitForMessage
+        ctx.session.selectedTicket = id
 
-    this.bot.action(/_resolved_(.*)/, ctx => {
-      let id = ctx.match[1]
-      let ticket = freshdesk.updateTicketAsync(id, { status: TicketStatus.Resolved })
+        ctx.reply('Введите сообщение')
+          .catch(err => console.error(err))
 
-      ctx.editMessageText(formatTicket(ticket), Extra.markup(m =>
-        m.inlineKeyboard([
-          m.callbackButton('Сообщение', '_message_' + id)
-        ])
-      ).markdown())
-      ctx.answerCbQuery(ctx.callbackQuery.id, 'Заявка решена', true)
-    })
+        ctx.answerCbQuery(ctx.callbackQuery.id, 'Введите сообщение', false)
+          .catch(err => console.error(err))
+      })
+
+    this.bot.action(
+      action => {
+        return /_resolved_(\d+)/.test(action)
+      },
+      ctx => {
+        console.info('resolved:', 'start')
+        let id = RegExp.$1
+        console.info('resolved:', id)
+
+        let ticket = freshdesk.updateTicketAsync(id, { status: TicketStatus.Resolved })
+          .then(() => {
+            console.info('resolved:', 'success')
+
+            ctx.editMessageText(formatTicket(ticket), Extra.markup(m =>
+              m.inlineKeyboard([
+                m.callbackButton('Сообщение', '_message_' + id)
+              ])
+            ).markdown())
+              .catch(err => console.error(err))
+
+            ctx.answerCbQuery(ctx.callbackQuery.id, 'Заявка решена', true)
+              .catch(err => console.error(err))
+          })
+          .catch(err => {
+            console.error(err)
+            ctx.reply('⚠️ Ошибка.')
+          })
+      })
   }
 
   sendMessage (userId, text) {
