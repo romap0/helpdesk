@@ -89,7 +89,7 @@ exports = class Bot {
         function onSuccess () {
           console.info('contact: register success')
           ctx.reply(
-            'Спасибо. Теперь вы можете создать новый тикет',
+            'Спасибо. Теперь вы можете создать новую заявку',
             Markup.keyboard([[Actions.NewTicket, Actions.MyTickets]])
               .resize()
               .extra()
@@ -108,7 +108,7 @@ exports = class Bot {
           tickets.forEach(ticket => {
             ctx.replyWithMarkdown(formatTicket(ticket), Extra.markup(m =>
               m.inlineKeyboard([
-                m.callbackButton('Сообщение', '_message_' + ticket.id),
+                m.callbackButton('Комментарий', '_message_' + ticket.id),
                 m.callbackButton('Решено', '_resolved_' + ticket.id, ticket.status === TicketStatus.Resolved)
               ])
             ))
@@ -141,11 +141,11 @@ exports = class Bot {
 
               ctx.replyWithMarkdown(formatTicket(ticket), Extra.markup(m =>
                 m.inlineKeyboard([
-                  m.callbackButton('Сообщение', '_message_' + ticket.id),
+                  m.callbackButton('Комментарий', '_message_' + ticket.id),
                   m.callbackButton('Решено', '_resolved_' + ticket.id)
                 ])
               ))
-              ctx.reply('Тикет создан. Введите подробности')
+              ctx.reply('Заявка создана. Введите подробности')
 
               resolve()
             })
@@ -173,10 +173,10 @@ exports = class Bot {
         ctx.session.state = States.WaitForMessage
         ctx.session.selectedTicket = id
 
-        ctx.reply('Введите сообщение')
+        ctx.reply('Введите комментарий')
           .catch(err => console.error(err))
 
-        ctx.answerCbQuery(ctx.callbackQuery.id, 'Введите сообщение', false)
+        ctx.answerCbQuery(ctx.callbackQuery.id, 'Введите комментарий', false)
           .catch(err => console.error(err))
       })
 
@@ -195,7 +195,7 @@ exports = class Bot {
 
             ctx.editMessageText(formatTicket(ticket), Extra.markup(m =>
               m.inlineKeyboard([
-                m.callbackButton('Сообщение', '_message_' + id)
+                m.callbackButton('Комментарий', '_message_' + id)
               ])
             ).markdown())
               .catch(err => console.error(err))

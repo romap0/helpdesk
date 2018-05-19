@@ -1,4 +1,4 @@
 exports = {
-  NewTicket: '➕ Новый тикет',
-  MyTickets: '📋 Мои тикеты'
+  NewTicket: '➕ Новая заявка',
+  MyTickets: '📋 Мои заявки'
 }
