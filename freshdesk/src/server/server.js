@@ -30,12 +30,10 @@ exports = {
             renderData()
           })
           .catch(err => {
-            new Bot(args.iparams.telegram_token).log(err.message)
             renderData({ message: err.message })
           })
       })
       .fail(function () {
-        new Bot(args.iparams.telegram_token).log('no url')
         renderData({ message: 'Error while setting webhook' })
       })
   },
@@ -54,7 +52,7 @@ exports = {
    * Create a ticket in freshdesk with bug creators email and summary
    */
   onExternalEvent: function (args) {
-    let freshdesk = require('./freshdesk')(args.iparams.freshdesk_domain, args.iparams.freshdesk_key)
+    let freshdesk = require('./freshdesk')(args.domain, args.iparams.freshdesk_key)
     try {
       console.info('new update:', typeof (args.data) === 'object' ? JSON.stringify(args.data) : args.data)
       console.info('typeof:', typeof (args.data))

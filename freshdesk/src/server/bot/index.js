@@ -176,7 +176,7 @@ exports = class Bot {
         ctx.reply('Введите комментарий')
           .catch(err => console.error(err))
 
-        ctx.answerCbQuery(ctx.callbackQuery.id, 'Введите комментарий', false)
+        ctx.answerCbQuery('Введите комментарий')
           .catch(err => console.error(err))
       })
 
@@ -200,7 +200,7 @@ exports = class Bot {
             ).markdown())
               .catch(err => console.error(err))
 
-            ctx.answerCbQuery(ctx.callbackQuery.id, 'Заявка решена', true)
+            ctx.answerCbQuery('Заявка решена')
               .catch(err => console.error(err))
           })
           .catch(err => {

@@ -9,7 +9,7 @@
   "product": {
     "freshdesk": {
       "location": {
-        "ticket_sidebar": {
+        "ticket_requester_info": {
           "url": "template.html",
           "icon": "icon.svg"
         }
