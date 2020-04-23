@@ -2,7 +2,7 @@ var gulp = require('gulp')
 const babel = require('gulp-babel')
 const eslint = require('gulp-eslint')
 
-gulp.task('babel', () =>
+const babelTask = () =>
   gulp.src(['src/**/*.js', '!**/node_modules/**/*'])
     .pipe(
       babel({
@@ -18,11 +18,9 @@ gulp.task('babel', () =>
     }))
     .pipe(eslint.format())
     .pipe(gulp.dest('dist'))
-)
 
-gulp.task('copy', () =>
+const copyTask = () =>
   gulp.src(['src/**/*', '!src/**/*.js'])
     .pipe(gulp.dest('dist'))
-)
 
-gulp.task('default', [ 'babel', 'copy' ])
+exports.default = gulp.series(babelTask, copyTask)
