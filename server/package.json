@@ -22,7 +22,7 @@
     "jsonpatch-to-mongodb": "^0.4.0",
     "moment": "^2.22.1",
     "mongodb": "^3.0.6",
-    "morgan": "^1.9.0",
+    "morgan": "^1.9.1",
     "node-cleanup": "^2.1.2",
     "telegraf": "^3.20.0"
   },
